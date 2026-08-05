@@ -197,6 +197,52 @@
 }
 .cb-fly svg { display: block; overflow: visible; }
 
+/* ---------- Bloom loading veil ---------- */
+@keyframes lf-loader-bloom {
+  0% { opacity: 0; transform: scale(.72) rotate(-9deg); filter: blur(18px) saturate(.8); }
+  55% { opacity: 1; transform: scale(1.04) rotate(2deg); filter: blur(0) saturate(1.08); }
+  100% { opacity: 1; transform: scale(1) rotate(0); filter: blur(0) saturate(1); }
+}
+@keyframes lf-loader-halo {
+  0%, 100% { transform: scale(.72); opacity: .2; }
+  50% { transform: scale(1.08); opacity: .55; }
+}
+@keyframes lf-loader-exit {
+  0% { opacity: 1; clip-path: circle(150% at 50% 50%); }
+  100% { opacity: 0; clip-path: circle(0% at 50% 50%); visibility: hidden; }
+}
+.lf-loader {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
+  background: var(--color-brand-cream); color: var(--color-brand-ink);
+  isolation: isolate; overflow: hidden;
+}
+.lf-loader__wash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, var(--color-brand-ivory), var(--color-brand-cream) 58%, var(--color-brand-blush)); z-index: -1; }
+.lf-loader__content { display: flex; flex-direction: column; align-items: center; gap: .7rem; }
+.lf-loader__bloom { position: relative; width: min(42vw, 260px); aspect-ratio: 1; display: grid; place-items: center; }
+.lf-loader__bloom img { width: 100%; height: 100%; object-fit: contain; animation: lf-loader-bloom 1.8s cubic-bezier(.19,1,.22,1) both; }
+.lf-loader__halo { position: absolute; inset: 12%; border-radius: 999px; background: var(--color-brand-gold); filter: blur(46px); opacity: .35; animation: lf-loader-halo 2.4s ease-in-out infinite; z-index: -1; }
+.lf-loader__eyebrow { font-size: 10px; letter-spacing: .42em; text-transform: uppercase; color: var(--color-brand-gold); font-weight: 600; }
+.lf-loader__label { font-family: var(--font-display); font-style: italic; font-size: 1.1rem; color: var(--color-brand-ink); opacity: .7; }
+.lf-loader--exit { animation: lf-loader-exit 1s cubic-bezier(.7,0,.2,1) forwards; pointer-events: none; }
+
+/* ---------- Flower-aware cursor ---------- */
+.lf-cursor { position: fixed; inset: 0; z-index: 70; pointer-events: none; }
+.lf-cursor__dot, .lf-cursor__halo { position: fixed; top: 0; left: 0; border-radius: 999px; translate: -50% -50%; will-change: transform; }
+.lf-cursor__dot { width: 5px; height: 5px; background: var(--color-brand-gold); box-shadow: 0 0 0 1px rgba(255,255,255,.75), 0 0 16px rgba(179,139,93,.65); }
+.lf-cursor__halo { width: 28px; height: 28px; border: 1px solid rgba(179,139,93,.55); transition: width .45s cubic-bezier(.19,1,.22,1), height .45s cubic-bezier(.19,1,.22,1), border-color .45s; }
+.lf-cursor.is-flower .lf-cursor__halo { width: 44px; height: 44px; border-color: rgba(179,139,93,.9); box-shadow: 0 0 28px rgba(179,139,93,.22); }
+
+/* ---------- Hero bloom depth/parallax ---------- */
+.lf-bloom-layer { will-change: transform; transition: transform .25s ease-out; }
+.lf-bloom-layer--back { transform: translate3d(calc(var(--cam-mx) * -10px), calc(var(--cam-my) * -8px), -40px) scale(1.08) !important; }
+.lf-bloom-layer--main { transform: translate3d(calc(var(--cam-mx) * 14px), calc(var(--cam-my) * 11px), 20px) !important; }
+.lf-hero-petal { will-change: transform; animation-name: lf-petal-drift !important; }
+@keyframes lf-petal-drift {
+  0% { transform: translate3d(0, -6vh, 0) rotate(0deg); opacity: 0; }
+  12% { opacity: .65; }
+  100% { transform: translate3d(var(--petal-drift), 112vh, 0) rotate(var(--petal-tilt)); opacity: 0; }
+}
+
 /* ---------- Glassmorphism utilities ---------- */
 .glass {
   background: rgba(255, 255, 255, 0.18);
@@ -479,6 +525,15 @@ body { transform: translate3d(calc(var(--cam-mx) * 3px), 0, 0); }
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .lf-cursor { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lf-loader { display: none; }
+  .lf-hero-petal, .lf-loader__bloom img, .lf-loader__halo { animation: none !important; }
+  .lf-bloom-layer--back, .lf-bloom-layer--main { transform: translateZ(0) scale(1) !important; transition: none; }
 }
 
 @layer base {

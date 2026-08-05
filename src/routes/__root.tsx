@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CursorButterflies } from "@/components/CursorButterflies";
+import { BloomLoader } from "@/components/BloomLoader";
 import { useSiteAnimations, playRouteEnter } from "@/lib/animate";
 import { useRouterState } from "@tanstack/react-router";
 
@@ -108,7 +109,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-brand-cream">
       <head>
         <HeadContent />
       </head>
@@ -130,6 +131,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <BloomLoader />
       <CursorButterflies count={5} />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />

@@ -210,7 +210,7 @@ function Index() {
             <span
               key={i}
               aria-hidden
-              className="absolute top-[-10%] rounded-[80%_0_55%_50%_/_55%_0_80%_50%] pointer-events-none"
+              className="lf-hero-petal absolute top-[-10%] rounded-[80%_0_55%_50%_/_55%_0_80%_50%] pointer-events-none"
               style={{
                 left: `${left}%`,
                 width: size,
@@ -218,6 +218,8 @@ function Index() {
                 background: bg,
                 opacity: 0.65,
                 animation: `lf-drift ${dur}s linear ${delay}s infinite`,
+                ["--petal-drift" as string]: `${(i % 3) * 9 - 9}px`,
+                ["--petal-tilt" as string]: `${(i % 2 ? -1 : 1) * (12 + i * 3)}deg`,
               }}
             />
           );
@@ -986,6 +988,7 @@ const Portal = memo(function Portal({
         onMouseMove={onMove}
         onMouseLeave={onLeave}
         className="lf-portal group relative aspect-[4/5] overflow-hidden rounded-[6px] shadow-[20px_40px_60px_-15px_rgba(28,26,23,0.25)] ring-1 ring-stone-900/5 cursor-pointer w-full block"
+        data-flower-target
         style={{ ["--accent" as string]: accent }}
         aria-label={`Open Portal ${index + 1} — ${title}`}
       >
@@ -1251,6 +1254,7 @@ function FlowerRotor() {
         onPointerUp={onUp}
         onPointerCancel={onUp}
         className="lf-rotor relative z-10 w-[72vw] sm:w-[460px] md:w-[560px] aspect-square select-none cam-layer cam-z--near"
+        data-flower-target
         style={{ animationDuration: "9s" }}
       >
         <div className="lf-rotor-inner">
@@ -1259,14 +1263,14 @@ function FlowerRotor() {
             src={petalBack}
             alt=""
             aria-hidden
-            className="absolute inset-0 w-full h-full object-contain opacity-70 lf-bloom"
+            className="lf-bloom-layer lf-bloom-layer--back absolute inset-0 w-full h-full object-contain opacity-70 lf-bloom"
             style={{ transform: "translateZ(-40px) scale(1.08)" }}
           />
           {/* main bloom */}
           <img
             src={heroFlower}
             alt="An enchanted multi-layered peony and orchid bloom dusted with gold"
-            className="absolute inset-0 w-full h-full object-contain lf-bloom drop-shadow-[0_40px_60px_rgba(179,139,93,0.25)]"
+            className="lf-bloom-layer lf-bloom-layer--main absolute inset-0 w-full h-full object-contain lf-bloom drop-shadow-[0_40px_60px_rgba(179,139,93,0.25)]"
             style={{ transform: "translateZ(20px)" }}
             width={1280}
             height={1280}
