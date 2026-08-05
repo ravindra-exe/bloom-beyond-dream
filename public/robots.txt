@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bloom-beyond-dreams.lovable.app/sitemap.xml
