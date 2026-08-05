@@ -5,7 +5,11 @@ import { memo, useEffect, useRef } from "react";
  * Realistic wing anatomy, iridescent gradients, soft motion blur.
  * Pure DOM + rAF — zero React re-renders, 60fps.
  */
-export const CursorButterflies = memo(function CursorButterflies({ count = 3 }: { count?: number }) {
+export const CursorButterflies = memo(function CursorButterflies({
+  count = 3,
+}: {
+  count?: number;
+}) {
   const layerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,10 +19,18 @@ export const CursorButterflies = memo(function CursorButterflies({ count = 3 }: 
     const layer = layerRef.current;
     if (!layer) return;
 
-    const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const target = { x: window.innerWidth / 2, y: window.innerHeight / 2, flower: false };
+    const cursor = document.createElement("div");
+    cursor.className = "lf-cursor";
+    cursor.innerHTML = '<span class="lf-cursor__dot"></span><span class="lf-cursor__halo"></span>';
+    layer.appendChild(cursor);
+    const dot = cursor.querySelector<HTMLElement>(".lf-cursor__dot");
+    const halo = cursor.querySelector<HTMLElement>(".lf-cursor__halo");
     const onMove = (e: MouseEvent) => {
       target.x = e.clientX;
       target.y = e.clientY;
+      const flower = (e.target as HTMLElement | null)?.closest("[data-flower-target]");
+      target.flower = Boolean(flower);
     };
     window.addEventListener("mousemove", onMove, { passive: true });
 
@@ -145,6 +157,11 @@ export const CursorButterflies = memo(function CursorButterflies({ count = 3 }: 
     let t = 0;
     const tick = () => {
       t += 0.016;
+      if (dot && halo) {
+        dot.style.transform = `translate3d(${target.x}px, ${target.y}px, 0)`;
+        halo.style.transform = `translate3d(${target.x}px, ${target.y}px, 0) scale(${target.flower ? 1.65 : 1})`;
+        cursor.classList.toggle("is-flower", target.flower);
+      }
       for (let i = 0; i < items.length; i++) {
         const b = items[i];
         const ox = Math.cos(t * 1.1 + b.phase) * b.wobble;
@@ -161,17 +178,16 @@ export const CursorButterflies = memo(function CursorButterflies({ count = 3 }: 
         const flap = Math.sin(t * b.flapSpeed + b.phase) * (55 + Math.min(speed * 4, 25));
         const tilt = Math.min(speed * 1.2, 18);
 
-        b.el.style.transform =
-          `translate3d(${b.x}px, ${b.y}px, 0) translate(-50%, -50%) rotate(${angle}deg)`;
+        b.el.style.transform = `translate3d(${b.x}px, ${b.y}px, 0) translate(-50%, -50%) rotate(${angle}deg)`;
         // pseudo-3D wing fold: scaleX the wings to fake perspective
         const fold = Math.cos((flap * Math.PI) / 180);
         b.wingR.setAttribute(
           "transform",
-          `scale(${fold.toFixed(3)}, 1) rotate(${(tilt * 0.4).toFixed(2)})`
+          `scale(${fold.toFixed(3)}, 1) rotate(${(tilt * 0.4).toFixed(2)})`,
         );
         b.wingL.setAttribute(
           "transform",
-          `scale(${(-fold).toFixed(3)}, 1) rotate(${(-tilt * 0.4).toFixed(2)})`
+          `scale(${(-fold).toFixed(3)}, 1) rotate(${(-tilt * 0.4).toFixed(2)})`,
         );
       }
       raf = requestAnimationFrame(tick);
@@ -182,6 +198,7 @@ export const CursorButterflies = memo(function CursorButterflies({ count = 3 }: 
       cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
       items.forEach((b) => b.el.remove());
+      cursor.remove();
     };
   }, [count]);
 
